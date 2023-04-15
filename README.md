@@ -30,8 +30,7 @@ En la primera etapa de proyecto se realiza un programa que a través de un despl
 
 #### CLIENTES
 
-Crear un cliente que utilice el protocolo HTTP para solicitar a un servidor una figura específica y obtener la información de las piezas necesarias para construir el objeto solicitado.
->>>>>>> cd575c2 (update Readme)
+Crear un cliente que utilice conexión segura SSL para solicitar a un servidor una figura específica y obtener la información de las piezas necesarias para construir el objeto solicitado.
 
 
 ##### Resolución
@@ -77,7 +76,7 @@ Para encontrar lego y su cantidad correspondiente:
 
 ### Compilación y Ejecución del código
 
-Recordar que para poder compilar el programa se debe de tener descargado en su sistema la biblioteca libssl-dev.
+Recordar que para poder compilar el programa se debe de tener descargado en su sistema la biblioteca *libssl-dev*.
 
 Para poder compilar y correr el código, se provee un archivo Makefile que asiste en la compilación y construcción del programa. Con esto, para la compilación es solo necesario el siguiente comando:
 
@@ -99,7 +98,7 @@ Para la compilación de los casos de prueba, se puede usar el siguiente comando 
 
 `make test`
 
-Con el fin de poder usar este comando se debe de descargar en el sistema  icdiff que es una herramienta de comparación de archivos y directorios.
+Con el fin de poder usar este comando se debe de descargar en el sistema  *icdiff* que es una herramienta de comparación de archivos y directorios.
 
 
 ### Detener la Ejecución
