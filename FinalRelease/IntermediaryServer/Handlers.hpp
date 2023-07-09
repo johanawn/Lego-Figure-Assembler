@@ -201,18 +201,16 @@ class RequestHandler : public Handler<std::shared_ptr<Request>>  {
       case serverAction::requestingAssembly:
         {
         // for the case where the figure still exists
-        std::cout << figure << std::endl;
-        std::string figureName = figure.substr(9, figure.size());
-        std::cout << figureName << std::endl;
-        if (this->tryConnection(figureName) != nullptr) {
+        if (this->routingMap->count(figure) != 0) {
           // write response
-
+          this->reportAssembled(responseString, figure);
+        
         // for the case where the figure does not exist
         } else {
           // erase the figure from the map
-
+          this->routingMap->erase(figure);
           // write response
-
+          this->reportNotAssemble(responseString, figure);
         }
 
         responseString += "suuuuuuuuuup\n";
@@ -240,71 +238,55 @@ class RequestHandler : public Handler<std::shared_ptr<Request>>  {
     this->responseQueue->push(response);
   }
 
-  void requestImage(std::string& figure, std::string& response, std::vector<char>& responseVector) {
-    int pos = figure.size() - 1;
+  void reportAssembled(std::string& response, std::string figure) {
+    response +=
+        "<SCRIPT LANGUAGE=javascript>\n"
+        "function home() {\n"
+          "window.location( \"/lego/index.php\" );\n"
+        "}\n"
+        "</SCRIPT>\n";
 
-    while (figure[pos] != '/' && pos != 0) {
-      pos--;
-    }
+    response +=
+        "<DIV class=\"st10\">"
+        "<TABLE WIDTH=100%>\n";
+    response += pageHeader;
 
-    int end = figure.size() - 1;
+    response += 
+        "<HR>\n"
+        "<CENTER><H2>" + figure + " ha sido armada</H2></CENTER>\n";
 
-    while (figure[end] != '.' && end != 0) {
-      end--;
-    }
+    response +=
+      "<TR>\n"
+      "<TD> <A HREF=\"/lego/index.php\"> Regresar </A>\n"
+      "</TR>\n";
 
-    if (pos == 0 || end == 0) {
-      response += "404";
-      return;
-    }
-
-    std::string figureBuffer = figure.substr(pos + 1, end - pos - 1);
-
-    if (this->routingMap->count(figureBuffer) == 0) {
-      response += "404";
-      return;
-    }
-
-    std::unique_ptr<Socket> piecesServerConnection =
-        std::move(tryConnection(figureBuffer)); // check for nullptr
-
-    if (piecesServerConnection == nullptr) {
-      response += "404";
-      return;
-    }
-
-    int imageBufferSize = 16384; // 100 kb lol
-
-    piecesServerConnection->setBufferDefault(imageBufferSize);
-
-    // receive info from pieces server
-    std::string request;
-    request.push_back(LEGO_REQUEST);
-    request.push_back(SEPARATOR);
-    request += figure;
-
-    *piecesServerConnection << request;
-
-    std::vector<char> responseBuffer;
-
-    int bytesRead = 0;
-
-    // just receive the stream of bytes in raw
-    while ((bytesRead = (*piecesServerConnection >> responseBuffer)) > 0) {
-      responseVector = std::move(responseBuffer);
-      if (bytesRead != imageBufferSize) {
-        break;
-      }
-    }
-    piecesServerConnection->Close();
+    response += "</TABLE>\n";
   }
 
-  void reportAssembled (std::string& response, std::string figure) {
 
-  }
+  void reportNotAssemble(std::string& response, std::string figure) {
+    response +=
+        "<SCRIPT LANGUAGE=javascript>\n"
+        "function home() {\n"
+          "window.location( \"/lego/index.php\" );\n"
+        "}\n"
+        "</SCRIPT>\n";
 
-  void reportNotAssemble (std::string& response, std::string figure) {
+    response +=
+        "<DIV class=\"st10\">"
+        "<TABLE WIDTH=100%>\n";
+    response += pageHeader;
 
+    response += 
+        "<HR>\n"
+        "<CENTER><H2>" + figure + " no ha sido armada</H2></CENTER>\n";
+
+    response +=
+      "<TR>\n"
+      "<TD> <A HREF=\"/lego/index.php\"> Regresar </A>\n"
+      "</TR>\n";
+
+    response += "</TABLE>\n";
   }
 
   void getParts(std::string& response, std::string figure) {
